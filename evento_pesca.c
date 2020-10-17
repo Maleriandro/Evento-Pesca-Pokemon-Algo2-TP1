@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "evento_pesca.h"
 
-#define FORMATO_LECTURA "%[^;];%d;%d;%[^\n]\n"
+#define FORMATO_LECTURA "%[^;];%i;%i;%s\n"
 #define FORMATO_ESCRITURA "%s;%i;%i;%s\n"
 #define CANT_CARACTERISTICAS_POKEMON 4
 
@@ -15,7 +15,6 @@
 arrecife_t* crear_arrecife(const char* ruta_archivo) {
     FILE* archivo = fopen(ruta_archivo,"r");
     if(!archivo){
-        printf("No se pudo cargar ningun dato del Arrefice\n");
         return NULL;
     }
 
@@ -55,25 +54,31 @@ arrecife_t* crear_arrecife(const char* ruta_archivo) {
 
     // Achica el vector, ya que el ultimo parametro es invalido, siempre y cuando
     // el for no haya terminado por un error del realloc
-    if (alloc_ok) {
-        pokemon_t *new_pokemon = realloc(pokemon, (sizeof(pokemon_t) * ((size_t)nro_pokemon)));
+    arrecife_t* arrecife = NULL;
 
-        // En el caso de que no pueda achicar el vector, no devuelvo error ya que igualmente
-        // el ultimo elemento del vector no se usaba en el resto del programa por la
-        // cantidad_pokemon
-        if (new_pokemon) pokemon = new_pokemon;
+    if (nro_pokemon > 0) {
+        if (alloc_ok) {
+            pokemon_t *new_pokemon = realloc(pokemon, (sizeof(pokemon_t) * ((size_t)nro_pokemon)));
 
-    }
+            // En el caso de que no pueda achicar el vector, no devuelvo error ya que igualmente
+            // el ultimo elemento del vector no se usaba en el resto del programa por la
+            // cantidad_pokemon
+            if (new_pokemon) pokemon = new_pokemon;
 
-    arrecife_t *arrecife = malloc(sizeof(arrecife_t));
+        }
 
-    if (arrecife) {
+        arrecife = malloc(sizeof(arrecife_t));
 
-    (*arrecife).pokemon = pokemon;
-    (*arrecife).cantidad_pokemon = nro_pokemon;
+        if (arrecife) {
+
+        (*arrecife).pokemon = pokemon;
+        (*arrecife).cantidad_pokemon = nro_pokemon;
+        }
+
+    } else {
+        free(pokemon);
     }
     
-
     return arrecife;
 }
 
@@ -133,7 +138,6 @@ int trasladar_pokemon(arrecife_t* arrecife, acuario_t* acuario, bool (*seleccion
 
     int resultado_de_funcion;
     if (!hay_suficientes_pokemons) {
-        printf("no hay suficientes pokemones como para sacar\n");
         resultado_de_funcion = ERROR;
     } else {
         pokemon_t* nuevo_acuario  = realloc(pkmn_acuario_viejo, sizeof(pokemon_t) * (cant_pkmn_acuario_viejo + (size_t)cant_seleccion));
@@ -185,7 +189,6 @@ void censar_arrecife(arrecife_t* arrecife, void (*mostrar_pokemon)(pokemon_t*)){
 int guardar_datos_acuario(acuario_t* acuario, const char* nombre_archivo) {
     FILE* archivo = fopen(nombre_archivo,"w");
     if(!archivo){
-        printf("No se pudo guardar los datos del acuario\n");
         return ERROR;
     }
 
@@ -204,14 +207,20 @@ int guardar_datos_acuario(acuario_t* acuario, const char* nombre_archivo) {
 }
 
 void liberar_acuario(acuario_t* acuario) {
-    pokemon_t* vector_pokemons = (*acuario).pokemon;
-    if (vector_pokemons) free(vector_pokemons);
-    free(acuario);
+    //Para evitar que que la funcion intente liberar el vector de pokemons que no existe
+    if (acuario) {
+        pokemon_t* vector_pokemons = (*acuario).pokemon;
+
+        if (vector_pokemons) free(vector_pokemons);
+        free(acuario);
+    }
 }
 
 void liberar_arrecife(arrecife_t* arrecife) {
-    pokemon_t* vector_pokemons = (*arrecife).pokemon;
+    if (arrecife) {
+        pokemon_t* vector_pokemons = (*arrecife).pokemon;
 
-    if (vector_pokemons) free(vector_pokemons);
-    free(arrecife);
+        if (vector_pokemons) free(vector_pokemons);
+        free(arrecife);
+    }
 }
