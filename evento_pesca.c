@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include "evento_pesca.h"
 
-#define FORMATO_LECTURA "%[^;];%i;%i;%s\n"
+//Tuve que poner los limites de los strings, sino en las pruebas del chachutron al
+//escribir el valor de uno de los datos, terminaba siendo más largo de lo esperado
+//y escribia en memoria no reservada.
+#define FORMATO_LECTURA "%100[^;];%i;%i;%50[^\n]\n"
 #define FORMATO_ESCRITURA "%s;%i;%i;%s\n"
 #define CANT_CARACTERISTICAS_POKEMON 4
 

@@ -81,7 +81,7 @@ int main() {
     transferencia_invalida = trasladar_pokemon(arrecife, acuario, condicion_pokemon[0], cant_pokemons_sacados[0]);
 
     for (int i = 1; i < CANTIDAD_CONDICIONES && transferencia_invalida == 0; i++) {
-        // censar_arrecife(arrecife, imprimir_pokemon);
+        censar_arrecife(arrecife, imprimir_pokemon);
 
         transferencia_invalida = trasladar_pokemon(arrecife, acuario, condicion_pokemon[i], cant_pokemons_sacados[i]);
     }
